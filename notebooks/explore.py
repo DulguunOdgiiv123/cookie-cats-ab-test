@@ -2,18 +2,16 @@ import pandas as pd
 
 df = pd.read_csv("data/cookie_cats.csv")
 
-print(df.head())
-
-print(df["version"].value_counts())
+#print(df.head())
 
 
-retention_1 = df.groupby("version")["retention_1"].mean()
-print(retention_1)
-
-gate_30_success = df[df["version"] == "gate_30"].value_counts()
-print(gate_30_success)
+print(df.groupby("version")["retention_1"].sum())
 
 
-gate_40_success = df[df["version"] == "gate_40"].value_counts()
-print(gate_40_success)
+from statsmodels.stats.proportion import proportions_ztest
+successes = [20034, 20119]
+sample_sizes = [44700, 45489]
+stat,p_value = proportions_ztest(successes,sample_sizes)
 
+print(successes)
+print(sample_sizes)
