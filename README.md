@@ -1,26 +1,45 @@
-# Cookie Cats A/B testing
+# Cookie Cats A/B Test
 
-Using "Cookie Cats" dataset to A/B test. It examines what happens when player installs game and randomly assigned to gate_30 and gate_40. 
-The data we have is from 90,189 players that installed the game while the AB-test was running. The variables are:
+Using the "Cookie Cats" mobile game dataset to run a real A/B test. It examines what happens when a player installs the game and is randomly assigned to either `gate_30` or `gate_40` — two versions of the game with a level-progression gate placed at different points.
 
-**userid**: A unique number that identifies each player.
-**version**: Whether the player was put in the control group (gate_30 - a gate at level 30) or the group with the moved gate (gate_40 - a gate at level 40).
-**sum_gamerounds**: the number of game rounds played by the player during the first 14 days after install.
-**retention_1**: Did the player come back and play 1 day after installing?
-**retention_7**: Did the player come back and play 7 days after installing?
+The data covers 90,189 players who installed the game while the A/B test was running. Variables:
 
-When a player installed the game, he or she was randomly assigned to either.
+- **userid**: A unique identifier for each player.
+- **version**: Whether the player was placed in the control group (`gate_30` — gate at level 30) or the treatment group (`gate_40` — gate moved to level 40).
+- **sum_gamerounds**: Number of game rounds played during the first 14 days after install.
+- **retention_1**: Did the player come back and play 1 day after installing?
+- **retention_7**: Did the player come back and play 7 days after installing?
 
 ## Project Goal
 
-The goal of this project is to see which version is more likely to make player come back and play ( higher retention rate ). So stakeholder or devs would have data based information. 
+Determine which gate placement leads to better player retention, so stakeholders have data-backed evidence for the decision rather than guesswork.
+
+## Key Findings
+
+A two-proportion z-test was run comparing `gate_30` vs `gate_40` at two time horizons:
+
+| Metric | gate_30 | gate_40 | P-value | Significant? |
+|---|---|---|---|---|
+| Day-1 retention | 44.8% | 44.2% | 0.074 | No |
+| Day-7 retention | 19.0% | 18.2% | 0.0016 | **Yes** |
+
+**Day-1 retention** showed no statistically significant difference — the small gap is consistent with random noise.
+
+**Day-7 retention** showed a statistically significant *drop* for `gate_40`. With ~90,000 players in the sample, a gap this size is very unlikely to be due to chance.
+
+**Recommendation:** keep the gate at level 30. Day-7 retention is generally a stronger signal of real, lasting engagement than day-1, and the data shows `gate_40` modestly but reliably hurts it.
 
 ## Architecture
+
+
+
 Kaggle CSVs (1 file1)
 │
 ▼
 Python / pandas (dashboard/app.py, notebooks/explore.py)
-
+│
+▼
+statisical testing (statsmodel) + streamlit dashboard
 
 ## Tech Stack
 
@@ -40,3 +59,15 @@ Run it locally with:
 streamlit run dashboard/app.py
 ```
 
+## Setup & Reproduction
+
+1. Download the [Cookie Cats dataset](https://www.kaggle.com/datasets/yufengsui/mobile-games-ab-testing) into `data/`
+2. Install dependencies:
+```bash
+   pip install pandas statsmodels streamlit plotly --break-system-packages
+```
+3. Run the analysis or dashboard:
+```bash
+   python notebooks/explore.py
+   streamlit run dashboard/app.py
+```
